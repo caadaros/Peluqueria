@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import jakarta.inject.Qualifier;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,7 +22,7 @@ public class AgendaService {
 
     @Autowired 
     private AgendaRepository repository;
-    
+
     @Autowired 
     private WebClient webClientDisponibilidad;
 
@@ -45,7 +44,7 @@ public class AgendaService {
             );
     }
 
-// ── VALIDACIONES ─────────────────────────────────────────
+    // ── VALIDACIONES ─────────────────────────────────────────
     private void validarDisponibilidad(String rutProfesional, String fecha, String horaInicio) {
 
         // 1. Validar contra el repositorio local primero
@@ -74,6 +73,45 @@ public class AgendaService {
                 "No se puede conectar con api Disponibilidad: " + e.getMessage());
         }
     }
+
+    private void validarTipoServicio(Long idTipoServicio) {
+
+        try {
+            webClientTipoServicio.get()
+                    .uri("/api/tipoServicio/{id}", idTipoServicio)
+                    .retrieve()
+                    .bodyToMono(Long.class)
+                    .block();
+            log.info(">>> Tipo de servicio {} validado correctamente", idTipoServicio);
+
+        } catch (WebClientResponseException.NotFound e) {
+            throw new RuntimeException(
+                    "El tipo de servicio con id " + idTipoServicio + " no existe.");
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "No se puede conectar con Tipo de Servicio: " + e.getMessage());
+        }
+    }
+
+        private void validarCliente(String rutCliente) {
+
+        try {
+            webClientCliente.get()
+                    .uri("/api/cliente/{rut}", rutCliente)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            log.info(">>> Cliente {} validado correctamente", rutCliente);
+
+        } catch (WebClientResponseException.NotFound e) {
+            throw new RuntimeException(
+                    "El cliente con rut " + rutCliente + " no existe.");
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "No se puede conectar con Cliente: " + e.getMessage());
+        }
+    }
+
 
     // ── CRUD ─────────────────────────────────────────
     public List<AgendaResponseDTO> obtenerTodas() {
@@ -104,6 +142,8 @@ public class AgendaService {
 
     public AgendaResponseDTO guardar(AgendaRequestDTO dto) {
         validarDisponibilidad(dto.getRutProfesional(), dto.getFecha(), dto.getHoraInicio());
+        validarTipoServicio(dto.getIdTipoServicio());
+        validarCliente(dto.getRutCliente());
 
         Agenda agenda = new Agenda(
             null,
