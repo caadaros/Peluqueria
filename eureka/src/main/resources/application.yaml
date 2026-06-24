@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: eureka
+
+server:
+  port: 8761
+
+eureka:
+  client:
+    register-with-eureka: false #No es un cliente eukera
+    fetch-registry: false #No se autoregistra en el servidor eureka
+  instance:
+    hostname: localhost
+  server:
+    enable-self-preservation: false

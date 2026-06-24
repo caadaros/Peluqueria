@@ -1,0 +1,60 @@
+package com.peluqueria.cliente.Controller;
+//Controlador. Su trabajo es recibir las peticiones que llegan por internet (HTTP) y decidir qué hacer con ellas.
+
+import com.peluqueria.cliente.dto.ClienteRequestDTO;
+import com.peluqueria.cliente.dto.ClienteResponseDTO;
+import com.peluqueria.cliente.Service.ClienteService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/cliente") //URL inicial
+@RequiredArgsConstructor
+public class ClienteController {
+    //Al ser final, garantizas que no cambie la variable ClienteService una vez ejecutado el código
+    private final ClienteService clienteService;
+    
+    //devuelve la lista completa
+    @GetMapping
+    public ResponseEntity<List<ClienteResponseDTO>> obtenerTodas() {
+        return ResponseEntity.ok(clienteService.obtenerTodos());
+    }
+
+    //Busca por ID, si la encuentra la muestra, de lo contrario irá al GlobalException
+    @GetMapping("/{rut}")
+    public ResponseEntity<ClienteResponseDTO> obtenerPorId(@PathVariable ("rut") String rutCliente) {
+        return clienteService.obtenerPorId(rutCliente)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    //Recibe un JSON del cuerpo y valida que los datos estén bien (devuelve un 201) y crea un TipoServ
+    @PostMapping
+    public ResponseEntity<ClienteResponseDTO> crear(@Valid @RequestBody ClienteRequestDTO dto) {
+        return ResponseEntity.status(201).body(clienteService.guardar(dto));
+    }
+
+    //busca el ID ingresado, si existe sobrescribe el dato anterior, de lo contrario devuelve un NotFound
+    @PutMapping("/{rut}")
+    public ResponseEntity<ClienteResponseDTO> actualizar(
+            @PathVariable ("rut") String rutCliente,
+            @Valid @RequestBody ClienteRequestDTO dto) {
+        return clienteService.actualizar(rutCliente, dto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    //Verifica  si el ID existe, si no existe responde un notFound, si existe lo elimina e indica un mensaje de elimiado
+    @DeleteMapping("/{rut}")
+    public ResponseEntity<String> eliminar(@PathVariable ("rut") String rutCliente) {
+        if (clienteService.obtenerPorId(rutCliente).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        clienteService.eliminar(rutCliente);
+        return ResponseEntity.ok("El pcliente con RUT " + rutCliente + " fue eliminado correctamente.");
+
+    }
+}

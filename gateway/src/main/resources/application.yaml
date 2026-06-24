@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: gateway
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: agendaurl #Nombre de la ruta asignado por nosotros se inventa en este momento
+          uri: lb://agendaurl #Nombre del servicio registrado en Eureka
+          predicates:
+            - Path=/users/** ##Ruta de acceso a la URL de cada MS obtenido del Controller. Siempre termina con **
+
+        - id: disponibilidadurl #Nombre de la ruta asignado por nosotros se inventa en este momento
+          uri: lb://disponibilidadurl #Nombre del servicio registrado en Eureka
+          predicates:
+            - Path=/users/** ##Ruta de acceso a la URL de cada MS obtenido del Controller
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/ #URL del servidor Eureka
+
