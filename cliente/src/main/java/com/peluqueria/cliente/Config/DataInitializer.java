@@ -20,13 +20,13 @@ public class DataInitializer implements CommandLineRunner{
             return;
         }
         clienteRepository.save(new Cliente
-            ("111111111", "Lisa", "Simpsons", 123456789, "lisa.simpsons@gmail.com"));
+            ("111111111", "Lisa", "Simpsons", "123456789", "lisa.simpsons@gmail.com"));
         clienteRepository.save(new Cliente
-            ("111111112", "Bart", "Simpsons", 987654321, "bart.simpsons@gmail.com"));
+            ("111111112", "Bart", "Simpsons", "987654321", "bart.simpsons@gmail.com"));
         clienteRepository.save(new Cliente
-            ("111111113", "Maggie", "Simpsons", 555555555, "maggie.simpsons@gmail.com"));
+            ("111111113", "Maggie", "Simpsons", "555555555", "maggie.simpsons@gmail.com"));
         clienteRepository.save(new Cliente
-            ("111111114", "Juanita", "Perez", 987654321, "juanita.perez@gmail.com"));
+            ("111111114", "Juanita", "Perez", "987654321", "juanita.perez@gmail.com"));
         log.info(">>> Cliente: {} Clientes insertados.", clienteRepository.count());
     }
 }

@@ -24,7 +24,7 @@ public class Cliente {
     private String apellidoCliente;
     
     @Column(nullable = false, length = 9)
-    private int telefonoCliente;
+    private String telefonoCliente;
 
     @Column(nullable = false, length = 100, unique = true)
     private String correoCliente;

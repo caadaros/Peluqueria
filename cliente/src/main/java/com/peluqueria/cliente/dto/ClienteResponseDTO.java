@@ -12,6 +12,6 @@ public class ClienteResponseDTO {
     private String rutCliente;
     private String nombreCliente;
     private String apellidoCliente;
-    private int telefonoCliente;
+    private String telefonoCliente;
     private String correoCliente;
 }
