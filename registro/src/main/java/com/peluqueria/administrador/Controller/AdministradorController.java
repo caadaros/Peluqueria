@@ -2,7 +2,7 @@ package com.peluqueria.administrador.Controller;
 //Controlador. Su trabajo es recibir las peticiones que llegan por internet (HTTP) y decidir qué hacer con ellas.
 
 import com.peluqueria.administrador.dto.*;
-import com.peluqueria.administrador.Service.AdmministradorService;
+import com.peluqueria.administrador.Service.AdministradorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

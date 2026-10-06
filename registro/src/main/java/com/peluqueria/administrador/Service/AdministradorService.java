@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor // Genera automáticamente un constructor que incluye el campo final TipoServRepository
-public class AdmministradorService {
+public class AdministradorService {
     //Al ser final, garantizas que no cambie la variable tipoServRepository una vez ejecutado el código
     private final AdministradorRepository administradorRepository;
 
