@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: cliente
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+server:
+  port: ${PORT:8084}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:https://eureka-hvy0.onrender.com/eureka/}
+  instance:
+    prefer-ip-address: true
+    # 2. CAMBIADO: Reemplazamos RENDER_EXTERNAL_HOSTNAME por nuestra variable interna
+    hostname: ${RENDER_INTERNAL_HOST:localhost} 
+    # 3. CAMBIADO: El ID de instancia debe incluir el hostname para que Eureka diferencie las URLs internas
+    instance-id: ${spring.application.name}:${eureka.instance.hostname}:${server.port}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

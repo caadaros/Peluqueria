@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: eureka
+
+server:
+  port: ${PORT:8761}
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: https://${eureka.instance.hostname}/eureka/
+  instance:
+    hostname: ${RENDER_EXTERNAL_HOSTNAME}
+    prefer-ip-address: true
+  server:
+    enable-self-preservation: false
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health
