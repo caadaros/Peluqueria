@@ -22,19 +22,19 @@ Cada entidad del dominio es un microservicio independiente, registrado en Eureka
 |---|---|---|---|
 | **eureka** | Servidor de descubrimiento (Service Registry) | 8761 | – |
 | **gateway** | API Gateway, punto de entrada único | 8080 | – |
-| **tipoServicio** | Catálogo de servicios ofrecidos (corte, color, manicure, etc.) | 8081 | MySQL |
-| **profesional** | Gestión de profesionales y sus especialidades | 8082 | MySQL |
-| **disponibilidadProfesional** | Disponibilidad horaria de cada profesional | 8083 | MySQL |
+| **tipoServicio** | Catálogo de servicios ofrecidos (corte, color, manicure, etc.) | 8081 | Oracle |
+| **profesional** | Gestión de profesionales y sus especialidades | 8082 | Oracle |
+| **disponibilidadProfesional** | Disponibilidad horaria de cada profesional | 8083 | Oracle |
 | **cliente** | Gestión de clientes | 8084 | Oracle |
-| **agenda** | Citas; consulta a cliente, tipoServicio y disponibilidad | 8085 | MySQL |
+| **agenda** | Citas; consulta a cliente, tipoServicio y disponibilidad | 8085 | Oracle |
 | **auth** | Login y registro de usuarios, emisión de JWT | 8086 | Oracle |
-| **registro** | Registro de atenciones (cita, cliente, profesional, servicio y producto usado) | 8087 | MySQL |
-| **producto** | Catálogo de productos | 8088 | MySQL |
-| **bodega** | Bodegas | 8089 | MySQL |
-| **kardex** | Movimientos y stock; consulta a producto y bodega | 8090 | MySQL |
-| **boleta** | Boletas | 8091 | MySQL |
-| **pago** | Pagos | 8092 | MySQL |
-| **notificacion** | Notificaciones a clientes | 8093 | MySQL |
+| **registro** | Registro de atenciones (cita, cliente, profesional, servicio y producto usado) | 8087 | Oracle |
+| **producto** | Catálogo de productos | 8088 | Oracle |
+| **bodega** | Bodegas | 8089 | Oracle |
+| **kardex** | Movimientos y stock; consulta a producto y bodega | 8090 | Oracle |
+| **boleta** | Boletas | 8091 | Oracle |
+| **pago** | Pagos | 8092 | Oracle |
+| **notificacion** | Notificaciones a clientes | 8093 | v |
 
 ---
 
