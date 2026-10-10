@@ -86,19 +86,6 @@ GET  http://localhost:8080/api/agenda
 
 Los demás servicios siguen el mismo patrón: `http://localhost:<puerto>/swagger-ui.html`.
 
-### Remota (desplegada en Render)
-
-| Microservicio | Swagger UI |
-|---|---|
-| Gateway (vista general) | https://gateway-dtzp.onrender.com/swagger-ui.html |
-| Cliente | https://gateway-dtzp.onrender.com/cliente/v3/api-docs |
-| Profesional | https://gateway-dtzp.onrender.com/profesional/v3/api-docs |
-| Tipo de Servicio | https://gateway-dtzp.onrender.com/tipoServicio/v3/api-docs |
-| Disponibilidad Profesional | https://gateway-dtzp.onrender.com/disponibilidadProfesional/v3/api-docs |
-| Agenda | https://gateway-dtzp.onrender.com/agenda/v3/api-docs |
-
----
-
 ## Instrucciones de ejecución
 
 ### Requisitos previos
