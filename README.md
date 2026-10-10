@@ -83,7 +83,7 @@ GET  http://localhost:8080/api/agenda
 
 ```bash
 git clone https://github.com/caadaros/Peluqueria.git
-cd <Peluqueria>
+cd Peluqueria
 ```
 
 ### 2. Configurar las variables de entorno
