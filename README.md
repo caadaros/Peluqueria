@@ -34,7 +34,7 @@ Cada entidad del dominio es un microservicio independiente, registrado en Eureka
 | **kardex** | Movimientos y stock; consulta a producto y bodega | 8090 | Oracle |
 | **boleta** | Boletas | 8091 | Oracle |
 | **pago** | Pagos | 8092 | Oracle |
-| **notificacion** | Notificaciones a clientes | 8093 | v |
+| **notificacion** | Notificaciones a clientes | 8093 | Oracle |
 
 ---
 
