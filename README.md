@@ -11,7 +11,7 @@ Cada entidad del dominio es un microservicio independiente, registrado en Eureka
 ---
 
 ## Nombre del estudiante
-
+- Daniel Azocar
 - Carolina Adaros
 
 ---
