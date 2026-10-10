@@ -86,7 +86,17 @@ git clone https://github.com/caadaros/Peluqueria.git
 cd Peluqueria
 ```
 
-### 2. Ejecución con Docker Compose 
+### 2. Configurar las variables de entorno
+
+```bash
+cp .env.example .env
+```
+
+Edita `.env` y completa los valores reales (secreto JWT, usuario administrador, credenciales de Oracle y de MySQL). El archivo `.env` no se sube a Git.
+
+Para generar un secreto JWT: `openssl rand -base64 32`.
+
+### 3A. Ejecución con Docker Compose (recomendada)
 
 ```bash
 docker compose up --build
@@ -109,7 +119,7 @@ Para reconstruir un solo microservicio tras un cambio de código:
 docker compose up --build cliente
 ```
 
-### 3. Compilar y empaquetar con Maven (genera el .jar)
+### 3B. Compilar y empaquetar con Maven (genera el .jar)
 
 Cada microservicio es un proyecto Maven independiente. Ejemplo con `cliente`:
 
