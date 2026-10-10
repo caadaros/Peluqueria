@@ -7,28 +7,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-// ═══════════════════════════════════════════════════
-// solo inserta si la
-// BD está vacía (count == 0).
-// ═══════════════════════════════════════════════════
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
-    private final ProductoRepository productoRepository;
+    private final ProductoRepository repository;
 
     @Override
     public void run(String... args) {
-        if (productoRepository.count() > 0) {
+        if (repository.count() > 0) {
             log.info(">>> Producto: BD ya tiene datos, se omite la carga inicial.");
             return;
         }
-        productoRepository.save(new Producto(null, "Shampoo Anticaspa Garnier 500 ml", 50000, "Unidad"));
-        productoRepository.save(new Producto(null, "Acondicionador Sedal",10000, "Unidad"));
-        productoRepository.save(new Producto(null, "Tintura de Pelo Cobrizo Color",80000, "Unidad"));
-        productoRepository.save(new Producto(null, "Aceite de coco Natural",30000, "Unidad"));
-        log.info(">>> Producto: {} Productos insertados.", productoRepository.count());
+        repository.save(new Producto(null, "SHAMP-001", "Shampoo profesional", "500 ml", 8500, "Activo"));
+        repository.save(new Producto(null, "TINTE-001", "Tinte castaño", "Tubo 60 ml", 6500, "Activo"));
+        repository.save(new Producto(null, "ACOND-001", "Acondicionador", "500 ml", 9000, "Activo"));
+        log.info(">>> Producto: {} registros insertados.", repository.count());
     }
 }

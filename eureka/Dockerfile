@@ -1,26 +1,16 @@
-# ── Etapa 1: compilar ──────────────────────────────────────────
-# Usamos el Maven de la imagen oficial (no dependemos de mvnw,
-# evitando problemas de permisos/CRLF al subir desde Windows)
-FROM maven:3.9.9-eclipse-temurin-21-alpine AS builder
-WORKDIR /app
-
-# Copiar solo el pom primero (capa cacheada de dependencias)
-COPY pom.xml ./
-RUN mvn dependency:go-offline -q
-
-# Copiar el código fuente y compilar sin tests
+# ---------- Build ----------
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /build
+COPY pom.xml .
+RUN mvn -B -q dependency:go-offline
 COPY src ./src
-RUN mvn clean package -DskipTests -q
+RUN mvn -B -q clean package -DskipTests
 
-# ── Etapa 2: imagen final ligera ───────────────────────────────
-FROM eclipse-temurin:21-jre-alpine
+# ---------- Runtime ----------
+FROM eclipse-temurin:21-jre
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends wget \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-
-# wget es necesario para el healthcheck definido en docker-compose
-RUN apk add --no-cache wget
-
-COPY --from=builder /app/target/*.jar app.jar
-
-EXPOSE ${PORT}
-
+COPY --from=build /build/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

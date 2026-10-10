@@ -19,12 +19,12 @@ public class DisponibilidadProfesional {
     @Column(name = "rutProfesional", nullable = false)
     private String rutProfesional;
 
-    @Column(nullable = false, columnDefinition = "DATE")
+    @Column(nullable = false)
     private String fecha;
 
-    @Column(nullable = false, columnDefinition = "TIME")
+    @Column(nullable = false)
     private String horaInicio;
 
-    @Column(nullable = false, columnDefinition = "TIME")
+    @Column(nullable = false)
     private String horaFin;
 }

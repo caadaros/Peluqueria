@@ -1,10 +1,9 @@
 package com.peluqueria.bodega.Service;
-// Servicio es el encargado de de contener la lógica de negocio y coordinar las operaciones.
 
 import com.peluqueria.bodega.Model.Bodega;
 import com.peluqueria.bodega.Repository.BodegaRepository;
-import com.peluqueria.bodega.dto.*;
-
+import com.peluqueria.bodega.dto.BodegaRequestDTO;
+import com.peluqueria.bodega.dto.BodegaResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,52 +13,52 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor // Genera automáticamente un constructor que incluye el campo final BodegaRepository
+@RequiredArgsConstructor
 public class BodegaService {
-    //Al ser final, garantizas que no cambie la variable bodegaRepository una vez ejecutado el código
-    private final BodegaRepository bodegaRepository;
+    private final BodegaRepository repository;
 
-    //Mapeo
-    private BodegaResponseDTO mapToDTO(Bodega bodega) {
+    private BodegaResponseDTO mapToDTO(Bodega e) {
         return new BodegaResponseDTO(
-                bodega.getIdBodega(),
-                bodega.getDescripcionBodega(),
-                bodega.getUbicacionBodega()
-        );
-    
+                e.getIdBodega(),
+                e.getNombreBodega(),
+                e.getDireccionBodega(),
+                e.getEstado());
     }
 
-    //Obtiene la lista total
+    private void validar(BodegaRequestDTO dto, Long idActual) {
+    }
+
     public List<BodegaResponseDTO> obtenerTodas() {
-        return bodegaRepository.findAll().stream()
-            .map(this::mapToDTO).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(this::mapToDTO).collect(Collectors.toList());
     }
 
-    //El Optional te avisa si el servicio existe o si el ID enviado no encontró nada (evitando errores de "null")
-    public Optional<BodegaResponseDTO> obtenerPorId(Long idBodega) {
-        return bodegaRepository.findById(idBodega).map(this::mapToDTO);
+    public Optional<BodegaResponseDTO> obtenerPorId(Long id) {
+        return repository.findById(id).map(this::mapToDTO);
     }
 
-    //Recibe un objeto y lo manda a la base de datos. Si el objeto tiene un ID existente, lo actualiza; si no tiene ID, lo crea.
+    public List<BodegaResponseDTO> buscarPorNombre(String nombre) {
+        return repository.findByNombreBodegaContainingIgnoreCase(nombre).stream()
+                .map(this::mapToDTO).collect(Collectors.toList());
+    }
+
     public BodegaResponseDTO guardar(BodegaRequestDTO dto) {
-        Bodega bodega = new Bodega(
-            null,
-            dto.getDescripcionBodega(),
-            dto.getUbicacionBodega()
-        );
-        return mapToDTO(bodegaRepository.save(bodega));
+        validar(dto, null);
+        Bodega nuevo = new Bodega(null, dto.getNombreBodega(), dto.getDireccionBodega(), dto.getEstado());
+        return mapToDTO(repository.save(nuevo));
     }
 
     public Optional<BodegaResponseDTO> actualizar(Long id, BodegaRequestDTO dto) {
-        return bodegaRepository.findById(id).map(existente -> {
-            existente.setDescripcionBodega(dto.getDescripcionBodega());
-            existente.setUbicacionBodega(dto.getUbicacionBodega());
-            return mapToDTO(bodegaRepository.save(existente));
+        return repository.findById(id).map(existente -> {
+            validar(dto, id);
+            existente.setNombreBodega(dto.getNombreBodega());
+            existente.setDireccionBodega(dto.getDireccionBodega());
+            existente.setEstado(dto.getEstado());
+            return mapToDTO(repository.save(existente));
         });
     }
 
-    //Borra los datos del ID especificado
-    public void eliminar(Long idBodega) {
-        bodegaRepository.deleteById(idBodega);
-    }    
+    public void eliminar(Long id) {
+        repository.deleteById(id);
+    }
 }

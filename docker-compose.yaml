@@ -1,169 +1,162 @@
-version: "3.9"
+name: peluqueria
 
-# ════════════════════════════════════════════════════════════════
-# Docker Compose - Sistema Peluquería (ejecución 100% local)
-# ════════════════════════════════════════════════════════════════
-# Orden de arranque controlado con depends_on + healthcheck:
-#   1. eureka
-#   2. cliente, profesional, tipoServicio, disponibilidadProfesional
-#   3. agenda (depende de los anteriores)
-#   4. gateway (depende de todos)
-#
-# Variables sensibles (usuario/clave Oracle) se inyectan desde el
-# archivo .env (no se sube a git). Ver .env.example adjunto.
-# ════════════════════════════════════════════════════════════════
+x-servicio: &servicio
+  restart: unless-stopped
+  depends_on:
+    eureka:
+      condition: service_healthy
+  volumes:
+    - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+
+x-entorno: &entorno
+  EUREKA_URL: http://eureka:8761/eureka/
+  JWT_SECRET: ${JWT_SECRET:-VGhpcyJzQVNlY3JldEtleUZvclBlbHVxdWVyaWFBcHBsaWNhdGlvblNhZmVSYW5kb21TdHJpbmc=}
+  JAVA_TOOL_OPTIONS: -Xmx256m
 
 services:
 
   eureka:
-    build:
-      context: ./eureka
-      dockerfile: Dockerfile
-    container_name: peluqueria-eureka
+    build: ./eureka
+    restart: unless-stopped
     ports:
       - "8761:8761"
     environment:
       PORT: 8761
+      JAVA_TOOL_OPTIONS: -Xmx256m
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8761/actuator/health"]
-      interval: 10s
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep -q UP || exit 1"]
+      interval: 15s
       timeout: 5s
       retries: 10
       start_period: 30s
-    networks:
-      - peluqueria-net
-
-  cliente:
-    build:
-      context: ./cliente
-      dockerfile: Dockerfile
-    container_name: peluqueria-cliente
-    ports:
-      - "8084:8084"
-    environment:
-      PORT: 8084
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      EUREKA_URL: http://eureka:8761/eureka/
-    depends_on:
-      eureka:
-        condition: service_healthy
-    networks:
-      - peluqueria-net
-
-  profesional:
-    build:
-      context: ./profesional
-      dockerfile: Dockerfile
-    container_name: peluqueria-profesional
-    ports:
-      - "8082:8082"
-    environment:
-      PORT: 8082
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      EUREKA_URL: http://eureka:8761/eureka/
-    depends_on:
-      eureka:
-        condition: service_healthy
-    networks:
-      - peluqueria-net
-
-  tipoServicio:
-    build:
-      context: ./tipoServicio
-      dockerfile: Dockerfile
-    container_name: peluqueria-tiposervicio
-    ports:
-      - "8081:8081"
-    environment:
-      PORT: 8081
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      EUREKA_URL: http://eureka:8761/eureka/
-    depends_on:
-      eureka:
-        condition: service_healthy
-    networks:
-      - peluqueria-net
-
-  disponibilidadProfesional:
-    build:
-      context: ./disponibilidadProfesional
-      dockerfile: Dockerfile
-    container_name: peluqueria-disponibilidad
-    ports:
-      - "8083:8083"
-    environment:
-      PORT: 8083
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      EUREKA_URL: http://eureka:8761/eureka/
-    depends_on:
-      eureka:
-        condition: service_healthy
-      profesional:
-        condition: service_started
-    networks:
-      - peluqueria-net
-
-  agenda:
-    build:
-      context: ./agenda
-      dockerfile: Dockerfile
-    container_name: peluqueria-agenda
-    ports:
-      - "8085:8085"
-    environment:
-      PORT: 8085
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      EUREKA_URL: http://eureka:8761/eureka/
-    depends_on:
-      eureka:
-        condition: service_healthy
-      cliente:
-        condition: service_started
-      profesional:
-        condition: service_started
-      tipoServicio:
-        condition: service_started
-      disponibilidadProfesional:
-        condition: service_started
-    networks:
-      - peluqueria-net
 
   gateway:
-    build:
-      context: ./gateway
-      dockerfile: Dockerfile
-    container_name: peluqueria-gateway
+    build: ./gateway
+    restart: unless-stopped
+    depends_on:
+      eureka:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
+      <<: *entorno
       PORT: 8080
-      EUREKA_URL: http://eureka:8761/eureka/
-    depends_on:
-      eureka:
-        condition: service_healthy
-      cliente:
-        condition: service_started
-      profesional:
-        condition: service_started
-      tipoServicio:
-        condition: service_started
-      disponibilidadProfesional:
-        condition: service_started
-      agenda:
-        condition: service_started
-    networks:
-      - peluqueria-net
 
-networks:
-  peluqueria-net:
-    driver: bridge
+  tipoServicio:
+    <<: *servicio
+    image: peluqueria-tiposervicio
+    build: ./tipoServicio
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *entorno
+      PORT: 8081
+
+  profesional:
+    <<: *servicio
+    build: ./profesional
+    ports:
+      - "8082:8082"
+    environment:
+      <<: *entorno
+      PORT: 8082
+
+  disponibilidadProfesional:
+    <<: *servicio
+    image: peluqueria-disponibilidadprofesional
+    build: ./disponibilidadProfesional
+    ports:
+      - "8083:8083"
+    environment:
+      <<: *entorno
+      PORT: 8083
+
+  cliente:
+    <<: *servicio
+    build: ./cliente
+    ports:
+      - "8084:8084"
+    environment:
+      <<: *entorno
+      PORT: 8084
+
+  agenda:
+    <<: *servicio
+    build: ./agenda
+    ports:
+      - "8085:8085"
+    environment:
+      <<: *entorno
+      PORT: 8085
+
+  auth:
+    <<: *servicio
+    build: ./auth
+    ports:
+      - "8086:8086"
+    environment:
+      <<: *entorno
+      PORT: 8086
+
+  registro:
+    <<: *servicio
+    build: ./registro
+    ports:
+      - "8087:8087"
+    environment:
+      <<: *entorno
+      PORT: 8087
+
+  producto:
+    <<: *servicio
+    build: ./producto
+    ports:
+      - "8088:8088"
+    environment:
+      <<: *entorno
+      PORT: 8088
+
+  bodega:
+    <<: *servicio
+    build: ./bodega
+    ports:
+      - "8089:8089"
+    environment:
+      <<: *entorno
+      PORT: 8089
+
+  kardex:
+    <<: *servicio
+    build: ./kardex
+    ports:
+      - "8090:8090"
+    environment:
+      <<: *entorno
+      PORT: 8090
+
+  boleta:
+    <<: *servicio
+    build: ./boleta
+    ports:
+      - "8091:8091"
+    environment:
+      <<: *entorno
+      PORT: 8091
+
+  pago:
+    <<: *servicio
+    build: ./pago
+    ports:
+      - "8092:8092"
+    environment:
+      <<: *entorno
+      PORT: 8092
+
+  notificacion:
+    <<: *servicio
+    build: ./notificacion
+    ports:
+      - "8093:8093"
+    environment:
+      <<: *entorno
+      PORT: 8093

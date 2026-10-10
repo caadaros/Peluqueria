@@ -1,5 +1,7 @@
 package com.peluqueria.agenda.Service;
 
+import com.peluqueria.agenda.Security.TokenForwarder;
+
 import com.peluqueria.agenda.dto.*;
 import com.peluqueria.agenda.Model.Agenda;
 import com.peluqueria.agenda.Repository.AgendaRepository;
@@ -23,6 +25,7 @@ public class AgendaService {
     private final WebClient webClientDisponibilidad;
     private final WebClient webClientTipoServicio;
     private final WebClient webClientCliente;
+    private final WebClient webClientNotificacion;
 
     private AgendaResponseDTO mapToDTO(Agenda a) {
         return new AgendaResponseDTO(
@@ -38,25 +41,19 @@ public class AgendaService {
 
     // ── VALIDACIONES ─────────────────────────────────────────
     private void validarDisponibilidad(String rutProfesional, String fecha, String horaInicio) {
-
-        // 1. Validar contra el repositorio local primero
         boolean ocupado = repository.existsByRutProfesionalAndFechaAndHoraInicio(rutProfesional, fecha, horaInicio);
         if (ocupado) {
             throw new RuntimeException("El profesional ya tiene una reserva en ese horario");
         }
-
-        // 2. Validar contra el microservicio externo
+        Boolean disponible;
         try {
-            webClientDisponibilidad.get()
-                .uri("/api/disponibilidadProfesional/profesional/{rut}/fechayHora/{fecha}/{hora}",
+            disponible = webClientDisponibilidad.get()
+                .uri("/api/disponibilidad/profesional/{rut}/disponible/{fecha}/{hora}",
                     rutProfesional, fecha, horaInicio)
+                .headers(TokenForwarder.forward())
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(Boolean.class)
                 .block();
-
-        } catch (WebClientResponseException.NotFound e) {
-            throw new RuntimeException(
-                "El profesional no tiene disponibilidad para la fecha y hora solicitadas.");
         } catch (WebClientResponseException e) {
             throw new RuntimeException(
                 "Error al consultar disponibilidad: " + e.getStatusCode());
@@ -64,15 +61,20 @@ public class AgendaService {
             throw new RuntimeException(
                 "No se puede conectar con api Disponibilidad: " + e.getMessage());
         }
+        if (!Boolean.TRUE.equals(disponible)) {
+            throw new RuntimeException(
+                "El profesional no tiene disponibilidad para la fecha y hora solicitadas.");
+        }
     }
 
     private void validarTipoServicio(Long idTipoServicio) {
 
         try {
             webClientTipoServicio.get()
-                    .uri("/api/tipoServicio/{id}", idTipoServicio)
+                    .uri("/api/tiposervicio/{id}", idTipoServicio)
+                    .headers(TokenForwarder.forward())
                     .retrieve()
-                    .bodyToMono(Long.class)
+                    .bodyToMono(String.class)
                     .block();
             log.info(">>> Tipo de servicio {} validado correctamente", idTipoServicio);
 
@@ -90,6 +92,7 @@ public class AgendaService {
         try {
             webClientCliente.get()
                     .uri("/api/cliente/{rut}", rutCliente)
+                    .headers(TokenForwarder.forward())
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -106,6 +109,23 @@ public class AgendaService {
 
 
     // ── CRUD ─────────────────────────────────────────
+    private void notificar(String tipo, Agenda a) {
+        try {
+            webClientNotificacion.post()
+                .uri("/api/notificacion")
+                .headers(TokenForwarder.forward())
+                .bodyValue(java.util.Map.of(
+                    "tipoNotificacion", tipo,
+                    "rutCliente", a.getRutCliente(),
+                    "detalle", "Cita del " + a.getFecha() + " a las " + a.getHoraInicio() + "."))
+                .retrieve()
+                .toBodilessEntity()
+                .block();
+        } catch (Exception e) {
+            log.warn(">>> No se pudo enviar la notificación ({}): {}", tipo, e.getMessage());
+        }
+    }
+
     public List<AgendaResponseDTO> obtenerTodas() {
         return repository.findAll().stream()
                 .map(this::mapToDTO).collect(Collectors.toList());
@@ -146,19 +166,30 @@ public class AgendaService {
             dto.getRutCliente(),
             dto.getEstadoCita()
         );
-        return mapToDTO(repository.save(agenda));
+        Agenda guardada = repository.save(agenda);
+        notificar("CONFIRMACION_RESERVA", guardada);
+        return mapToDTO(guardada);
     }
 
     public Optional<AgendaResponseDTO> actualizar(Integer idAgenda, AgendaRequestDTO dto) {
         return repository.findById(idAgenda).map(existente -> {
-            validarDisponibilidad(dto.getRutProfesional(), dto.getFecha(), dto.getHoraInicio());
+            boolean cambioHorario = !java.util.Objects.equals(existente.getRutProfesional(), dto.getRutProfesional())
+                || !java.util.Objects.equals(existente.getFecha(), dto.getFecha())
+                || !java.util.Objects.equals(existente.getHoraInicio(), dto.getHoraInicio());
+            if (cambioHorario) {
+                validarDisponibilidad(dto.getRutProfesional(), dto.getFecha(), dto.getHoraInicio());
+            }
             existente.setFecha(dto.getFecha());
             existente.setHoraInicio(dto.getHoraInicio());
             existente.setIdTipoServicio(dto.getIdTipoServicio());
             existente.setRutProfesional(dto.getRutProfesional());
             existente.setRutCliente(dto.getRutCliente());
             existente.setEstadoCita(dto.getEstadoCita());
-            return mapToDTO(repository.save(existente));
+            Agenda actualizada = repository.save(existente);
+            if (actualizada.getEstadoCita() != null && actualizada.getEstadoCita().toLowerCase().startsWith("cancel")) {
+                notificar("CANCELACION", actualizada);
+            }
+            return mapToDTO(actualizada);
         });
     }
 

@@ -1,75 +1,76 @@
 package com.peluqueria.producto.Controller;
-//Controlador. Su trabajo es recibir las peticiones que llegan por internet (HTTP) y decidir qué hacer con ellas.
 
-import com.peluqueria.producto.dto.*;
 import com.peluqueria.producto.Service.ProductoService;
+import com.peluqueria.producto.dto.ProductoRequestDTO;
+import com.peluqueria.producto.dto.ProductoResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/producto") //URL inicial
+@RequestMapping("/api/producto")
 @RequiredArgsConstructor
-@Tag(name = "Producto", description = "Operaciones relacionadas con el producto")
+@Tag(name = "Producto", description = "Operaciones de Producto")
 public class ProductoController {
-    //Al ser final, garantizas que no cambie la variable ProductoService una vez ejecutado el código
-    private final ProductoService productoService;
-    
-    //devuelve la lista completa
+    private final ProductoService service;
+
     @GetMapping
-    @Operation(summary = "Obtener todos los productos", description = "Devuelve una lista con todos los productos registrados")
-    @ApiResponse(responseCode = "200", description = "Lista de productos obtenida correctamente")
+    @Operation(summary = "Obtener todos los registros")
+    @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente")
     public ResponseEntity<List<ProductoResponseDTO>> obtenerTodas() {
-        return ResponseEntity.ok(productoService.obtenerTodas());
+        return ResponseEntity.ok(service.obtenerTodas());
     }
 
-    //Busca por ID, si la encuentra la muestra, de lo contrario irá al GlobalException
     @GetMapping("/{id}")
-    @Operation(summary = "Obtener producto por ID", description = "Devuelve un producto específico según su ID")
-    @ApiResponse(responseCode = "200", description = "Producto obtenido correctamente")
-    @ApiResponse(responseCode = "404", description = "Producto no encontrado")
-    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable ("id")Long idProducto) {
-        return productoService.obtenerPorId(idProducto)
+    @Operation(summary = "Obtener por ID")
+    @ApiResponse(responseCode = "200", description = "Registro encontrado")
+    @ApiResponse(responseCode = "404", description = "Registro no encontrado")
+    public ResponseEntity<ProductoResponseDTO> obtenerPorId(@PathVariable ("id") Long id) {
+        return service.obtenerPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //Recibe un JSON del cuerpo y valida que los datos estén bien (devuelve un 201) y crea un Producto
+    @GetMapping("/nombre/{nombre}")
+    @Operation(summary = "Obtener por nombre")
+    public ResponseEntity<List<ProductoResponseDTO>> buscarPorNombre(@PathVariable ("nombre") String nombre) {
+        return ResponseEntity.ok(service.buscarPorNombre(nombre));
+    }
+
     @PostMapping
-    @Operation(summary = "Crear un nuevo producto", description = "Crea un nuevo producto con los datos proporcionados")
-    @ApiResponse(responseCode = "201", description = "Producto creado correctamente")
-    public ResponseEntity<ProductoResponseDTO> crear(@Valid @RequestBody ProductoRequestDTO producto) {
-        return ResponseEntity.status(201).body(productoService.guardar(producto));
+    @Operation(summary = "Crear registro")
+    @ApiResponse(responseCode = "201", description = "Registro creado correctamente")
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    public ResponseEntity<ProductoResponseDTO> crear(@Valid @RequestBody ProductoRequestDTO dto) {
+        return ResponseEntity.status(201).body(service.guardar(dto));
     }
 
-    //busca el ID ingresado, si existe sobrescribe el dato anterior, de lo contrario devuelve un NotFound
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar producto", description = "Actualiza un producto existente según su ID")
-    @ApiResponse(responseCode = "200", description = "Producto actualizado correctamente")
-    @ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    @Operation(summary = "Actualizar registro")
+    @ApiResponse(responseCode = "200", description = "Registro actualizado correctamente")
+    @ApiResponse(responseCode = "404", description = "Registro no encontrado")
     public ResponseEntity<ProductoResponseDTO> actualizar(
-            @PathVariable ("id") Long idProducto,
+            @PathVariable ("id") Long id,
             @Valid @RequestBody ProductoRequestDTO dto) {
-        return productoService.actualizar(idProducto, dto)
+        return service.actualizar(id, dto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //Verifica  si el ID existe, si no existe responde un notFound, si existe lo elimina e indica un mensaje de elimiado
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar producto", description = "Elimina un producto existente según su ID")
-    @ApiResponse(responseCode = "200", description = "Producto eliminado correctamente")
-    @ApiResponse(responseCode = "404", description = "Producto no encontrado")
-    public ResponseEntity<Void> eliminar(@PathVariable ("id") Long idProducto) {
-        if (productoService.obtenerPorId(idProducto).isEmpty()) {
+    @Operation(summary = "Eliminar registro")
+    @ApiResponse(responseCode = "200", description = "Registro eliminado correctamente")
+    @ApiResponse(responseCode = "404", description = "Registro no encontrado")
+    public ResponseEntity<String> eliminar(@PathVariable ("id") Long id) {
+        if (service.obtenerPorId(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        productoService.eliminar(idProducto);
-        return ResponseEntity.noContent().build();
+        service.eliminar(id);
+        return ResponseEntity.ok("El registro " + id + " fue eliminado correctamente.");
     }
 }

@@ -1,25 +1,26 @@
 package com.peluqueria.bodega.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "DTO para la solicitud de creación o actualización de una bodega")
+@Schema(description = "DTO para la solicitud de creación o actualización de bodega")
 public class BodegaRequestDTO {
 
-    @Schema(description = "Nombre de la bodega", example = "Bodega Central")
-    @NotBlank(message = "La descripción no puede estar vacía")
-    private String descripcionBodega;
+    @Schema(description = "Nombre de la bodega", example = "Bodega central")
+    @NotBlank(message = "El nombre no puede estar vacío")
+    private String nombreBodega;
 
+    @Schema(description = "Dirección de la bodega", example = "Av. Principal 123")
+    @NotBlank(message = "La dirección no puede estar vacía")
+    private String direccionBodega;
 
-    @Schema(description = "Ubicación de la bodega", example = "Piso 1, Sector A")
-    @NotBlank(message = "La ubicación no puede estar vacía")
-    private String ubicacionBodega;
+    @Schema(description = "Estado de la bodega", example = "Activa")
+    @NotBlank(message = "El estado no puede estar vacío")
+    private String estado;
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BodegaResponseDTO {
     private Long idBodega;
-    private String descripcionBodega;
-    private String ubicacionBodega;
+    private String nombreBodega;
+    private String direccionBodega;
+    private String estado;
 }

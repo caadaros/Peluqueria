@@ -59,6 +59,11 @@ public class DisponibilidadController {
         return ResponseEntity.ok(service.buscarPorFecha(fecha));
     }
 
+    @GetMapping("/profesional/{rutProfesional}/disponible/{fecha}/{hora}")
+    public ResponseEntity<Boolean> disponible(@PathVariable ("rutProfesional") String rutProfesional, @PathVariable ("fecha") String fecha, @PathVariable ("hora") String hora) {
+        return ResponseEntity.ok(service.estaDisponible(rutProfesional, fecha, hora));
+    }
+
     @GetMapping("/profesional/{rutProfesional}/fechayHora/{fecha}/{hora}")
     @Operation(summary = "Obtener disponibilidad por profesional y fecha/hora", description = "Recupera una lista de disponibilidades para un profesional específico en una fecha y hora determinadas")
     @ApiResponse(responseCode = "200", description = "Lista de disponibilidades obtenida correctamente")

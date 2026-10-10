@@ -6,22 +6,18 @@ server:
   port: ${PORT:8761}
 
 eureka:
+  instance:
+    hostname: eureka
   client:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: https://${eureka.instance.hostname}/eureka/
-  instance:
-    hostname: ${RENDER_EXTERNAL_HOSTNAME}
-    prefer-ip-address: true
+      defaultZone: http://eureka:8761/eureka/
   server:
     enable-self-preservation: false
 
 management:
-  endpoint:
-    health:
-      show-details: always
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,info

@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: kardex
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: "jdbc:oracle:thin:@a6etg25wwemt8hfb_high?TNS_ADMIN=/app/wallet"
+    username: PELUQUERIA
+    password: ClaveSegura123!
+    hikari:
+      connection-timeout: 30000
+      validation-timeout: 5000
+      max-lifetime: 1800000
+      idle-timeout: 600000
+      minimum-idle: 1
+      maximum-pool-size: 3
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: ${PORT:8090}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:VGhpcyJzQVNlY3JldEtleUZvclBlbHVxdWVyaWFBcHBsaWNhdGlvblNhZmVSYW5kb21TdHJpbmc=}

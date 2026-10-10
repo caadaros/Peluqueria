@@ -1,5 +1,7 @@
 package com.peluqueria.disponibilidadProfesional.Service;
 
+import com.peluqueria.disponibilidadProfesional.Security.TokenForwarder;
+
 import com.peluqueria.disponibilidadProfesional.Repository.DisponibilidadRepository;
 import com.peluqueria.disponibilidadProfesional.Model.DisponibilidadProfesional;
 import com.peluqueria.disponibilidadProfesional.dto.DisponibilidadRequestDTO;
@@ -29,6 +31,7 @@ public class DisponibilidadService {
         try {
             webClient.get()
                     .uri("/api/profesional/{id}", rutProfesional)
+                    .headers(TokenForwarder.forward())
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();

@@ -1,10 +1,9 @@
 package com.peluqueria.producto.Service;
-// Servicio es el encargado de de contener la lógica de negocio y coordinar las operaciones.
 
 import com.peluqueria.producto.Model.Producto;
 import com.peluqueria.producto.Repository.ProductoRepository;
-import com.peluqueria.producto.dto.*;
-
+import com.peluqueria.producto.dto.ProductoRequestDTO;
+import com.peluqueria.producto.dto.ProductoResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,54 +13,61 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor // Genera automáticamente un constructor que incluye el campo final ProductoRepository
+@RequiredArgsConstructor
 public class ProductoService {
-    //Al ser final, garantizas que no cambie la variable productoRepository una vez ejecutado el código
-    private final ProductoRepository productoRepository;
+    private final ProductoRepository repository;
 
-    //Mapeo
-    private ProductoResponseDTO mapToDTO(Producto producto) {
+    private ProductoResponseDTO mapToDTO(Producto e) {
         return new ProductoResponseDTO(
-                producto.getIdProducto(),
-                producto.getDescripcionProducto(),
-                producto.getPrecioProducto(),
-                producto.getUnidadMedida()
-        );
-    
+                e.getIdProducto(),
+                e.getSkuProducto(),
+                e.getNombreProducto(),
+                e.getDescripcionProducto(),
+                e.getPrecioProducto(),
+                e.getEstado());
     }
 
-    //Obtiene la lista total
-    public List<ProductoResponseDTO> obtenerTodas() {
-        return productoRepository.findAll().stream()
-            .map(this::mapToDTO).collect(Collectors.toList());
-    }
-
-    //El Optional te avisa si el servicio existe o si el ID enviado no encontró nada (evitando errores de "null")
-    public Optional<ProductoResponseDTO> obtenerPorId(Long idProducto) {
-        return productoRepository.findById(idProducto).map(this::mapToDTO);
-    }
-
-    //Recibe un objeto y lo manda a la base de datos. Si el objeto tiene un ID existente, lo actualiza; si no tiene ID, lo crea.
-    public ProductoResponseDTO guardar(ProductoRequestDTO dto) {
-        Producto producto = new Producto(
-            null,
-            dto.getDescripcionProducto(), 
-            dto.getPrecioProducto(), 
-            dto.getUnidadMedida());
-        return mapToDTO(productoRepository.save(producto));
-    }
-
-    public Optional<ProductoResponseDTO> actualizar(Long id, ProductoRequestDTO dto) {
-        return productoRepository.findById(id).map(existente -> {
-            existente.setDescripcionProducto(dto.getDescripcionProducto());
-            existente.setPrecioProducto(dto.getPrecioProducto());
-            existente.setUnidadMedida(dto.getUnidadMedida());
-            return mapToDTO(productoRepository.save(existente));
+    private void validar(ProductoRequestDTO dto, Long idActual) {
+        repository.findBySkuProducto(dto.getSkuProducto()).ifPresent(p -> {
+            if (idActual == null || !p.getIdProducto().equals(idActual)) {
+                throw new RuntimeException("Ya existe un producto con el SKU " + dto.getSkuProducto());
+            }
         });
     }
 
-    //Borra los datos del ID especificado
-    public void eliminar(Long idProducto) {
-        productoRepository.deleteById(idProducto);
-    }    
+    public List<ProductoResponseDTO> obtenerTodas() {
+        return repository.findAll().stream()
+                .map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    public Optional<ProductoResponseDTO> obtenerPorId(Long id) {
+        return repository.findById(id).map(this::mapToDTO);
+    }
+
+    public List<ProductoResponseDTO> buscarPorNombre(String nombre) {
+        return repository.findByNombreProductoContainingIgnoreCase(nombre).stream()
+                .map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    public ProductoResponseDTO guardar(ProductoRequestDTO dto) {
+        validar(dto, null);
+        Producto nuevo = new Producto(null, dto.getSkuProducto(), dto.getNombreProducto(), dto.getDescripcionProducto(), dto.getPrecioProducto(), dto.getEstado());
+        return mapToDTO(repository.save(nuevo));
+    }
+
+    public Optional<ProductoResponseDTO> actualizar(Long id, ProductoRequestDTO dto) {
+        return repository.findById(id).map(existente -> {
+            validar(dto, id);
+            existente.setSkuProducto(dto.getSkuProducto());
+            existente.setNombreProducto(dto.getNombreProducto());
+            existente.setDescripcionProducto(dto.getDescripcionProducto());
+            existente.setPrecioProducto(dto.getPrecioProducto());
+            existente.setEstado(dto.getEstado());
+            return mapToDTO(repository.save(existente));
+        });
+    }
+
+    public void eliminar(Long id) {
+        repository.deleteById(id);
+    }
 }

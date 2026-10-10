@@ -36,4 +36,8 @@ public class WebClientConfig {
     public WebClient webClientCliente(WebClient.Builder builder) {
         return builder.baseUrl("http://cliente").build();
     }
+    @Bean
+    public WebClient webClientNotificacion(WebClient.Builder builder) {
+        return builder.baseUrl("http://notificacion").build();
+    }
 }
