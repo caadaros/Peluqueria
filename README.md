@@ -132,12 +132,6 @@ Requiere que Eureka esté disponible (`EUREKA_URL=http://localhost:8761/eureka/`
 
 > Nota: los módulos `auth`, `producto`, `bodega`, `kardex`, `boleta`, `pago`, `registro` y `notificacion` no incluyen `mvnw`; en ellos usa `mvn` instalado, o copia la carpeta `.mvn` y los archivos `mvnw`/`mvnw.cmd` desde otro módulo.
 
-### Ejecución remota (Render)
-
-Los microservicios están desplegados en Render como Web Services independientes, construidos desde su `Dockerfile`. Orden de despliegue: `eureka` → `cliente`, `profesional`, `tipoServicio`, `disponibilidadProfesional` → `agenda` → `gateway`.
-
-Punto de entrada público: `https://gateway-dtzp.onrender.com`
-
 ---
 
 ## Stack tecnológico
