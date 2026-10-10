@@ -26,6 +26,38 @@ spring:
           uri: lb://agenda
           predicates:
             - Path=/api/agenda/**
+        - id: auth
+          uri: lb://auth
+          predicates:
+            - Path=/auth/**
+        - id: registro
+          uri: lb://registro
+          predicates:
+            - Path=/api/registro/**
+        - id: producto
+          uri: lb://producto
+          predicates:
+            - Path=/api/producto/**
+        - id: bodega
+          uri: lb://bodega
+          predicates:
+            - Path=/api/bodega/**
+        - id: kardex
+          uri: lb://kardex
+          predicates:
+            - Path=/api/kardex/**
+        - id: boleta
+          uri: lb://boleta
+          predicates:
+            - Path=/api/boleta/**
+        - id: pago
+          uri: lb://pago
+          predicates:
+            - Path=/api/pago/**
+        - id: notificacion
+          uri: lb://notificacion
+          predicates:
+            - Path=/api/notificacion/**
 
         - id: cliente-docs
           uri: lb://cliente
