@@ -92,7 +92,7 @@ cd Peluqueria
 cp .env.example .env
 ```
 
-Edita `.env` y completa los valores reales (secreto JWT, usuario administrador, credenciales de Oracle y de MySQL). El archivo `.env` no se sube a Git.
+Edita `.env` y completa los valores reales (secreto JWT, usuario administrador, credenciales de Oracle). El archivo `.env` no se sube a Git.
 
 Para generar un secreto JWT: `openssl rand -base64 32`.
 
