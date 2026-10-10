@@ -111,8 +111,8 @@ Los demás servicios siguen el mismo patrón: `http://localhost:<puerto>/swagger
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <URL-DEL-REPOSITORIO>
-cd <CARPETA-DEL-REPOSITORIO>
+git clone <[https://github.com/caadaros/Peluqueria.git]>
+cd <Peluqueria>
 ```
 
 ### 2. Configurar las variables de entorno
