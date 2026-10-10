@@ -82,7 +82,7 @@ GET  http://localhost:8080/api/agenda
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <[https://github.com/caadaros/Peluqueria.git]>
+git clone https://github.com/caadaros/Peluqueria.git
 cd <Peluqueria>
 ```
 
