@@ -10,7 +10,7 @@ Cada entidad del dominio es un microservicio independiente, registrado en Eureka
 
 ---
 
-## Nombre del estudiante
+## Nombres
 - Daniel Azocar
 - Carolina Adaros
 
@@ -69,22 +69,6 @@ GET  http://localhost:8080/api/agenda
 ```
 
 ---
-
-## Documentación Swagger
-
-### Local (Docker Compose)
-
-| Microservicio | Swagger UI local |
-|---|---|
-| Cliente | http://localhost:8084/swagger-ui.html |
-| Profesional | http://localhost:8082/swagger-ui.html |
-| Tipo de Servicio | http://localhost:8081/swagger-ui.html |
-| Disponibilidad Profesional | http://localhost:8083/swagger-ui.html |
-| Agenda | http://localhost:8085/swagger-ui.html |
-| Auth | http://localhost:8086/swagger-ui.html |
-| Eureka (dashboard) | http://localhost:8761 |
-
-Los demás servicios siguen el mismo patrón: `http://localhost:<puerto>/swagger-ui.html`.
 
 ## Instrucciones de ejecución
 
