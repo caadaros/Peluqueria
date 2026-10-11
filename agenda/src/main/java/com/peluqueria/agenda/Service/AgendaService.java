@@ -1,49 +1,57 @@
 package com.peluqueria.agenda.Service;
 
+import com.peluqueria.agenda.Exception.ConflictoException;
+import com.peluqueria.agenda.Exception.RecursoNoEncontradoException;
+import com.peluqueria.agenda.Exception.ServicioNoDisponibleException;
 import com.peluqueria.agenda.Security.TokenForwarder;
-
+ 
 import com.peluqueria.agenda.dto.*;
 import com.peluqueria.agenda.Model.Agenda;
 import com.peluqueria.agenda.Repository.AgendaRepository;
-
+ 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+ 
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+ 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AgendaService {
-
+ 
     private final AgendaRepository repository;
     private final WebClient webClientDisponibilidad;
     private final WebClient webClientTipoServicio;
     private final WebClient webClientCliente;
     private final WebClient webClientNotificacion;
-
+ 
     private AgendaResponseDTO mapToDTO(Agenda a) {
         return new AgendaResponseDTO(
-            a.getIdAgenda(), 
-            a.getFecha(), 
+            a.getIdAgenda(),
+            a.getFecha(),
             a.getHoraInicio(),
-            a.getIdTipoServicio(), 
-            a.getRutProfesional(), 
-            a.getRutCliente(), 
+            a.getIdTipoServicio(),
+            a.getRutProfesional(),
+            a.getRutCliente(),
             a.getEstadoCita()
             );
     }
-
+ 
+    private boolean esCancelada(String estado) {
+        return estado != null && estado.toLowerCase().startsWith("cancel");
+    }
+ 
     // ── VALIDACIONES ─────────────────────────────────────────
     private void validarDisponibilidad(String rutProfesional, String fecha, String horaInicio) {
-        boolean ocupado = repository.existsByRutProfesionalAndFechaAndHoraInicio(rutProfesional, fecha, horaInicio);
-        if (ocupado) {
-            throw new RuntimeException("El profesional ya tiene una reserva en ese horario");
+        // Las citas canceladas no cuentan como horario ocupado
+        if (repository.existeCitaActiva(rutProfesional, fecha, horaInicio)) {
+            throw new ConflictoException("El profesional ya tiene una reserva en ese horario");
         }
         Boolean disponible;
         try {
@@ -55,20 +63,19 @@ public class AgendaService {
                 .bodyToMono(Boolean.class)
                 .block();
         } catch (WebClientResponseException e) {
-            throw new RuntimeException(
+            throw new ServicioNoDisponibleException(
                 "Error al consultar disponibilidad: " + e.getStatusCode());
         } catch (Exception e) {
-            throw new RuntimeException(
+            throw new ServicioNoDisponibleException(
                 "No se puede conectar con api Disponibilidad: " + e.getMessage());
         }
         if (!Boolean.TRUE.equals(disponible)) {
-            throw new RuntimeException(
+            throw new ConflictoException(
                 "El profesional no tiene disponibilidad para la fecha y hora solicitadas.");
         }
     }
-
+ 
     private void validarTipoServicio(Long idTipoServicio) {
-
         try {
             webClientTipoServicio.get()
                     .uri("/api/tiposervicio/{id}", idTipoServicio)
@@ -77,18 +84,17 @@ public class AgendaService {
                     .bodyToMono(String.class)
                     .block();
             log.info(">>> Tipo de servicio {} validado correctamente", idTipoServicio);
-
+ 
         } catch (WebClientResponseException.NotFound e) {
-            throw new RuntimeException(
+            throw new RecursoNoEncontradoException(
                     "El tipo de servicio con id " + idTipoServicio + " no existe.");
         } catch (Exception e) {
-            throw new RuntimeException(
+            throw new ServicioNoDisponibleException(
                     "No se puede conectar con Tipo de Servicio: " + e.getMessage());
         }
     }
-
-        private void validarCliente(String rutCliente) {
-
+ 
+    private void validarCliente(String rutCliente) {
         try {
             webClientCliente.get()
                     .uri("/api/cliente/{rut}", rutCliente)
@@ -97,17 +103,16 @@ public class AgendaService {
                     .bodyToMono(String.class)
                     .block();
             log.info(">>> Cliente {} validado correctamente", rutCliente);
-
+ 
         } catch (WebClientResponseException.NotFound e) {
-            throw new RuntimeException(
+            throw new RecursoNoEncontradoException(
                     "El cliente con rut " + rutCliente + " no existe.");
         } catch (Exception e) {
-            throw new RuntimeException(
+            throw new ServicioNoDisponibleException(
                     "No se puede conectar con Cliente: " + e.getMessage());
         }
     }
-
-
+ 
     // ── CRUD ─────────────────────────────────────────
     private void notificar(String tipo, Agenda a) {
         try {
@@ -125,38 +130,36 @@ public class AgendaService {
             log.warn(">>> No se pudo enviar la notificación ({}): {}", tipo, e.getMessage());
         }
     }
-
+ 
     public List<AgendaResponseDTO> obtenerTodas() {
         return repository.findAll().stream()
                 .map(this::mapToDTO).collect(Collectors.toList());
     }
-
+ 
     public Optional<AgendaResponseDTO> obtenerPorId(Integer idAgenda) {
         return repository.findById(idAgenda).map(this::mapToDTO);
     }
-
+ 
     public List<AgendaResponseDTO> buscarPorProfesional(String rutProfesional) {
         return repository.findByRutProfesional(rutProfesional)
                 .stream().map(this::mapToDTO).collect(Collectors.toList());
     }
-
+ 
     public List<AgendaResponseDTO> buscarPorCliente(String rutCliente) {
         return repository.findByRutCliente(rutCliente)
                 .stream().map(this::mapToDTO).collect(Collectors.toList());
     }
-
+ 
     public List<AgendaResponseDTO> buscarPorFecha(String fecha) {
         return repository.findByFecha(fecha)
                 .stream().map(this::mapToDTO).collect(Collectors.toList());
     }
-
-
-
+ 
     public AgendaResponseDTO guardar(AgendaRequestDTO dto) {
         validarDisponibilidad(dto.getRutProfesional(), dto.getFecha(), dto.getHoraInicio());
         validarTipoServicio(dto.getIdTipoServicio());
         validarCliente(dto.getRutCliente());
-
+ 
         Agenda agenda = new Agenda(
             null,
             dto.getFecha(),
@@ -170,15 +173,28 @@ public class AgendaService {
         notificar("CONFIRMACION_RESERVA", guardada);
         return mapToDTO(guardada);
     }
-
+ 
     public Optional<AgendaResponseDTO> actualizar(Integer idAgenda, AgendaRequestDTO dto) {
         return repository.findById(idAgenda).map(existente -> {
-            boolean cambioHorario = !java.util.Objects.equals(existente.getRutProfesional(), dto.getRutProfesional())
-                || !java.util.Objects.equals(existente.getFecha(), dto.getFecha())
-                || !java.util.Objects.equals(existente.getHoraInicio(), dto.getHoraInicio());
-            if (cambioHorario) {
+            boolean cancelando = esCancelada(dto.getEstadoCita());
+            boolean reactivando = esCancelada(existente.getEstadoCita()) && !cancelando;
+ 
+            boolean cambioHorario = !Objects.equals(existente.getRutProfesional(), dto.getRutProfesional())
+                || !Objects.equals(existente.getFecha(), dto.getFecha())
+                || !Objects.equals(existente.getHoraInicio(), dto.getHoraInicio());
+ 
+            // Si se cancela no se necesita el horario; si se reactiva hay que revalidarlo
+            if ((cambioHorario || reactivando) && !cancelando) {
                 validarDisponibilidad(dto.getRutProfesional(), dto.getFecha(), dto.getHoraInicio());
             }
+            // Revalidar solo cuando cambian estos datos
+            if (!Objects.equals(existente.getIdTipoServicio(), dto.getIdTipoServicio())) {
+                validarTipoServicio(dto.getIdTipoServicio());
+            }
+            if (!Objects.equals(existente.getRutCliente(), dto.getRutCliente())) {
+                validarCliente(dto.getRutCliente());
+            }
+ 
             existente.setFecha(dto.getFecha());
             existente.setHoraInicio(dto.getHoraInicio());
             existente.setIdTipoServicio(dto.getIdTipoServicio());
@@ -186,15 +202,14 @@ public class AgendaService {
             existente.setRutCliente(dto.getRutCliente());
             existente.setEstadoCita(dto.getEstadoCita());
             Agenda actualizada = repository.save(existente);
-            if (actualizada.getEstadoCita() != null && actualizada.getEstadoCita().toLowerCase().startsWith("cancel")) {
+            if (esCancelada(actualizada.getEstadoCita())) {
                 notificar("CANCELACION", actualizada);
             }
             return mapToDTO(actualizada);
         });
     }
-
+ 
     public void eliminar(Integer idAgenda) {
         repository.deleteById(idAgenda);
     }
-
 }
