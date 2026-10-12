@@ -1,8 +1,8 @@
-package com.peluqueria.producto.Controller;
+package com.peluqueria.Producto.Controller;
 
-import com.peluqueria.producto.Service.ProductoService;
-import com.peluqueria.producto.dto.ProductoRequestDTO;
-import com.peluqueria.producto.dto.ProductoResponseDTO;
+import com.peluqueria.Producto.Service.ProductoService;
+import com.peluqueria.Producto.dto.ProductoRequestDTO;
+import com.peluqueria.Producto.dto.ProductoResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

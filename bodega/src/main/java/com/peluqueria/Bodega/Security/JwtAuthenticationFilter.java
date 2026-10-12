@@ -1,4 +1,4 @@
-package com.peluqueria.bodega.Security;
+package com.peluqueria.Bodega.Security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

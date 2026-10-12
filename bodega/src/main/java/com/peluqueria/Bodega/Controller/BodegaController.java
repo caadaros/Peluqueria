@@ -1,8 +1,8 @@
-package com.peluqueria.bodega.Controller;
+package com.peluqueria.Bodega.Controller;
 
-import com.peluqueria.bodega.Service.BodegaService;
-import com.peluqueria.bodega.dto.BodegaRequestDTO;
-import com.peluqueria.bodega.dto.BodegaResponseDTO;
+import com.peluqueria.Bodega.Service.BodegaService;
+import com.peluqueria.Bodega.dto.BodegaRequestDTO;
+import com.peluqueria.Bodega.dto.BodegaResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

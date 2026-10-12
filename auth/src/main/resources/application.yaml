@@ -3,9 +3,9 @@ spring:
     name: auth
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
-    url: "jdbc:oracle:thin:@a6etg25wwemt8hfb_high?TNS_ADMIN=/app/wallet"
-    username: PELUQUERIA
-    password: ClaveSegura123!
+    url: "jdbc:oracle:thin:@a6etg25wwemt8hfb_high?TNS_ADMIN=${WALLET_PATH:/app/wallet}"
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     hikari:
       connection-timeout: 30000
       validation-timeout: 5000
@@ -41,8 +41,8 @@ springdoc:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:VGhpcyJzQVNlY3JldEtleUZvclBlbHVxdWVyaWFBcHBsaWNhdGlvblNhZmVSYW5kb21TdHJpbmc=}
+    secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION_MS:900000}
   bootstrap:
-    admin-username: admin
-    admin-password: MiPasswordFijo123!
+    admin-username: ${ADMIN_USERNAME:admin}
+    admin-password: ${ADMIN_PASSWORD}

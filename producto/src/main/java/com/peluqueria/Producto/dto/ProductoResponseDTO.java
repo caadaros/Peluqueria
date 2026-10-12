@@ -1,4 +1,4 @@
-package com.peluqueria.producto.dto;
+package com.peluqueria.Producto.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

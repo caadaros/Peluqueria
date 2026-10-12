@@ -1,7 +1,7 @@
-package com.peluqueria.producto.Config;
+package com.peluqueria.Producto.Config;
 
-import com.peluqueria.producto.Security.JwtAuthenticationFilter;
-import com.peluqueria.producto.Security.JwtService;
+import com.peluqueria.Producto.Security.JwtAuthenticationFilter;
+import com.peluqueria.Producto.Security.JwtService;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

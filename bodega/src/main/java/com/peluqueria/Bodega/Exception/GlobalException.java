@@ -1,4 +1,4 @@
-package com.peluqueria.bodega.Exception;
+package com.peluqueria.Bodega.Exception;
 /*Manejador Global de Excepciones. Su función principal es "interceptar" 
 los errores que ocurren en cualquier parte de tu aplicación 
 (especialmente en los controladores) y transformarlos en una respuesta 

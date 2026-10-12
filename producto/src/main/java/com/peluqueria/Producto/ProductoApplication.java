@@ -1,4 +1,4 @@
-package com.peluqueria.producto;
+package com.peluqueria.Producto;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

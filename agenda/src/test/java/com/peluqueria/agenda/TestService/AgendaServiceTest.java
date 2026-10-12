@@ -1,8 +1,10 @@
 package com.peluqueria.agenda.TestService;
 
+import com.peluqueria.agenda.Exception.ConflictoException;
 import com.peluqueria.agenda.Model.Agenda;
 import com.peluqueria.agenda.Repository.AgendaRepository;
 import com.peluqueria.agenda.Service.AgendaService;
+import com.peluqueria.agenda.dto.AgendaRequestDTO;
 import com.peluqueria.agenda.dto.AgendaResponseDTO;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -79,5 +82,22 @@ class AgendaServiceTest {
         doNothing().when(repository).deleteById(anyInt());
         service.eliminar(agendaFake.getIdAgenda());
         verify(repository).deleteById(agendaFake.getIdAgenda());
+    }
+
+    @Test
+    @DisplayName("guardar lanza ConflictoException si ya hay una cita activa en ese horario")
+    void guardar_horarioOcupado_lanzaConflicto() {
+        when(repository.existeCitaActiva(anyString(), anyString(), anyString())).thenReturn(true);
+
+        AgendaRequestDTO dto = new AgendaRequestDTO();
+        dto.setRutProfesional("11111111-1");
+        dto.setFecha("2026-08-10");
+        dto.setHoraInicio("09:00");
+        dto.setIdTipoServicio(1L);
+        dto.setRutCliente("22222222-2");
+        dto.setEstadoCita("Confirmado");
+
+        assertThrows(ConflictoException.class, () -> service.guardar(dto));
+        verify(repository, never()).save(any());
     }
 }

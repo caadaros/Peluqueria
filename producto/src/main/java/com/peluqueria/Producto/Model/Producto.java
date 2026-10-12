@@ -1,4 +1,4 @@
-package com.peluqueria.producto.Model;
+package com.peluqueria.Producto.Model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

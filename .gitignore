@@ -2,3 +2,6 @@
 target/
 .idea/
 *.iml
+Wallet_*/
+Wallet_*.zip
+cwallet_base64.txt

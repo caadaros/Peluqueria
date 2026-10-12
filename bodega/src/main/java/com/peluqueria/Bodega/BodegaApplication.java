@@ -1,4 +1,4 @@
-package com.peluqueria.bodega;
+package com.peluqueria.Bodega;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.peluqueria.bodega.dto;
+package com.peluqueria.Bodega.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;

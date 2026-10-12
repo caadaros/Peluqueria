@@ -1,4 +1,4 @@
-package com.peluqueria.bodega.dto;
+package com.peluqueria.Bodega.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

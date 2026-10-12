@@ -1,9 +1,9 @@
-package com.peluqueria.bodega.Service;
+package com.peluqueria.Bodega.Service;
 
-import com.peluqueria.bodega.Model.Bodega;
-import com.peluqueria.bodega.Repository.BodegaRepository;
-import com.peluqueria.bodega.dto.BodegaRequestDTO;
-import com.peluqueria.bodega.dto.BodegaResponseDTO;
+import com.peluqueria.Bodega.Model.Bodega;
+import com.peluqueria.Bodega.Repository.BodegaRepository;
+import com.peluqueria.Bodega.dto.BodegaRequestDTO;
+import com.peluqueria.Bodega.dto.BodegaResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

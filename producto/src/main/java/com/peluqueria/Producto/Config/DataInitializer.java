@@ -1,7 +1,7 @@
-package com.peluqueria.producto.Config;
+package com.peluqueria.Producto.Config;
 
-import com.peluqueria.producto.Model.Producto;
-import com.peluqueria.producto.Repository.ProductoRepository;
+import com.peluqueria.Producto.Model.Producto;
+import com.peluqueria.Producto.Repository.ProductoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

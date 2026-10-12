@@ -1,8 +1,8 @@
 package com.peluqueria.producto.TestService;
 
-import com.peluqueria.producto.Model.Producto;
-import com.peluqueria.producto.Repository.ProductoRepository;
-import com.peluqueria.producto.Service.ProductoService;
+import com.peluqueria.Producto.Model.Producto;
+import com.peluqueria.Producto.Repository.ProductoRepository;
+import com.peluqueria.Producto.Service.ProductoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

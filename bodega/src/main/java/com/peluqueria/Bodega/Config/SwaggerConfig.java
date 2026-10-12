@@ -1,4 +1,4 @@
-package com.peluqueria.bodega.Config;
+package com.peluqueria.Bodega.Config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

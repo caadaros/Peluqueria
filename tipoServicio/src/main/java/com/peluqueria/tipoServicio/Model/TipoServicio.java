@@ -30,13 +30,3 @@ public class TipoServicio {
     @Column(nullable = false, length = 100)
     private String especialidadAsociada;
 }
-
-/*  Para relacionar tablas utilizamos 2 anotaciones:
-    1. Muchos registros de una tabla están relacionados con un solo registro de otra tabla
-    @ManyToOne
-    @JoinColumn(name = "id_tipo_servicio") // Crea la llave foránea (FK) en la tabla
-    
-    2. Especificas que un elemento de esta tabla está realcionado con muchos registros de otra tabla
-    @OneToMany(mappedBy = "cliente") 
-    cliente sería desde donde se extrae la información
-*/

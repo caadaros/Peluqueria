@@ -1,4 +1,4 @@
-package com.peluqueria.bodega.Model;
+package com.peluqueria.Bodega.Model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

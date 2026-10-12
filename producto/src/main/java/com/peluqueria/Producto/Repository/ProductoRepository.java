@@ -1,6 +1,6 @@
-package com.peluqueria.producto.Repository;
+package com.peluqueria.Producto.Repository;
 
-import com.peluqueria.producto.Model.Producto;
+import com.peluqueria.Producto.Model.Producto;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

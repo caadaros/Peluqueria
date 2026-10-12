@@ -1,7 +1,7 @@
-package com.peluqueria.bodega.Config;
+package com.peluqueria.Bodega.Config;
 
-import com.peluqueria.bodega.Security.JwtAuthenticationFilter;
-import com.peluqueria.bodega.Security.JwtService;
+import com.peluqueria.Bodega.Security.JwtAuthenticationFilter;
+import com.peluqueria.Bodega.Security.JwtService;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

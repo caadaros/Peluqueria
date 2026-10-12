@@ -1,4 +1,4 @@
-package com.peluqueria.producto.Security;
+package com.peluqueria.Producto.Security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

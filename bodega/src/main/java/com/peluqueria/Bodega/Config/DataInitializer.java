@@ -1,7 +1,7 @@
-package com.peluqueria.bodega.Config;
+package com.peluqueria.Bodega.Config;
 
-import com.peluqueria.bodega.Model.Bodega;
-import com.peluqueria.bodega.Repository.BodegaRepository;
+import com.peluqueria.Bodega.Model.Bodega;
+import com.peluqueria.Bodega.Repository.BodegaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

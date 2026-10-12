@@ -1,8 +1,8 @@
 package com.peluqueria.bodega.TestService;
 
-import com.peluqueria.bodega.Model.Bodega;
-import com.peluqueria.bodega.Repository.BodegaRepository;
-import com.peluqueria.bodega.Service.BodegaService;
+import com.peluqueria.Bodega.Model.Bodega;
+import com.peluqueria.Bodega.Repository.BodegaRepository;
+import com.peluqueria.Bodega.Service.BodegaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
